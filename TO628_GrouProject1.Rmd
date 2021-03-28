@@ -1,0 +1,84 @@
+---
+title: 'Group Project #1: Prosper'
+author: "Team: RTeam.Is.Better.Than.Yours = TRUE" 
+date: "3/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Initial Data Exploration
+Before diving into our regression analysis, we reviewed the data to understand its structure and the nature of the information.  From our cursory review, we were able to determine a few things: our data has 33,542 observations, 51 different variables, and is fortunately fairly clean.  Only the variable installment_balance has NA's, with 153.
+
+```{r}
+#Loading data
+loandata = read.csv("ProjectA_Listings2013.csv")
+
+#Exploring data
+str(loandata)
+
+summary(loandata)
+
+```
+
+Based on the initial exploration, we need to perform data cleansing to make the dataset ready for analysis, including addressing the NAs and removing non-numeric / non-categorical columns, or categorical columns with too many factors to be useful (e.g., city).  We also change categorical variables to factor data types. 
+
+```{r}
+#Determining column numbers 
+colnames(loandata)
+
+#Changing certain variables to factors
+loandata$prosper_rating = as.factor(loandata$prosper_rating)
+loandata$scorex = as.factor(loandata$scorex)
+loandata$employment_status_description = as.factor(loandata$employment_status_description)
+
+#Removing non-factor description or text columns
+loandata_clean = loandata[, -c(4,5,15,20,22,23,30)]
+
+#Replacing N/As in installment_balance with zeros
+loandata_clean[is.na(loandata_clean)] = 0
+
+str(loandata_clean)
+summary(loandata_clean)
+```
+
+
+
+## Linear Regression
+Given our data has 51 variables, we ultimately want to determine the most salient variables to use, but to begin, we perform a regression of borrower_rate against all variables.  This will tell us right now which variables are most significant in determining a borrower's interest rate. 
+
+```{r}
+
+lin_reg_all = lm(borrower_rate ~., data = loandata_clean)
+summary(lin_reg_all)
+```
+We can next remove all the insignificant variables and re-run the regression. 
+
+```{r}
+#Re-running regression with only significant variables from previous regression
+lin_reg_sigonly = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + prosper_rating +
+                       listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + stated_monthly_income
+                     + employment_status_description + lender_indicator + monthly_debt + inquiries_last6_months + amount_delinquent 
+                     + current_credit_lines + open_credit_lines + total_open_revolving_accounts + total_inquiries + delinquencies_over30_days + is_homeowner, data = loandata_clean)
+
+summary(lin_reg_sigonly)
+
+```
+
+Based on our generalized linear model, the significant predictors of borrower_rate are:
+`r names(coef(lin_reg_sigonly))`
+
+
+## Logistic Regression
+
+```{r}
+
+
+log_reg = glm()
+
+```
+
+
+
