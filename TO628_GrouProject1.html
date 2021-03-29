@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="RTeam.Is.Better.Than.Yours = TRUE" />
+<meta name="author" content="Team: RTeam.Is.Better.Than.Yours = TRUE" />
 
 
 <title>Group Project #1: Prosper</title>
@@ -165,7 +165,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Group Project #1: Prosper</h1>
-<h4 class="author">RTeam.Is.Better.Than.Yours = TRUE</h4>
+<h4 class="author">Team: RTeam.Is.Better.Than.Yours = TRUE</h4>
 <h4 class="date">3/28/2021</h4>
 
 </div>
@@ -709,7 +709,7 @@ summary(lin_reg_all)</code></pre>
 ## Multiple R-squared:  0.9523, Adjusted R-squared:  0.9522 
 ## F-statistic: 1.132e+04 on 59 and 33482 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>We can next remove all the insignificant variables and re-run the regression.</p>
-<pre class="r"><code>#Importing library for VIF analysis
+<pre class="r"><code>#Re-running regression with only significant variables from previous regression
 lin_reg_sigonly = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + prosper_rating +
                        listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + stated_monthly_income
                      + employment_status_description + lender_indicator + monthly_debt + inquiries_last6_months + amount_delinquent 
@@ -824,10 +824,12 @@ summary(lin_reg_sigonly)</code></pre>
 ## Residual standard error: 1.333 on 33500 degrees of freedom
 ## Multiple R-squared:  0.9521, Adjusted R-squared:  0.952 
 ## F-statistic: 1.624e+04 on 41 and 33500 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>Based on our generalized linear model, the significant predictors of borrower_rate are (Intercept), number_of_days, principal_balance, loan_status, amount_funded, prosper_ratingAA, prosper_ratingB, prosper_ratingC, prosper_ratingD, prosper_ratingE, prosper_ratingHR, listing_term, listing_monthly_payment, scorex600-619, scorex620-639, scorex640-649, scorex650-664, scorex665-689, scorex690-701, scorex702-723, scorex724-747, scorex748-777, scorex778+, prosper_score, listing_category_id, stated_monthly_income, employment_status_descriptionFull-time, employment_status_descriptionNot employed, employment_status_descriptionOther, employment_status_descriptionPart-time, employment_status_descriptionRetired, employment_status_descriptionSelf-employed, lender_indicator, monthly_debt, inquiries_last6_months, amount_delinquent, current_credit_lines, open_credit_lines, total_open_revolving_accounts, total_inquiries, delinquencies_over30_days, is_homeownerTRUE.</p>
+<p>Based on our generalized linear model, the significant predictors of borrower_rate are: (Intercept), number_of_days, principal_balance, loan_status, amount_funded, prosper_ratingAA, prosper_ratingB, prosper_ratingC, prosper_ratingD, prosper_ratingE, prosper_ratingHR, listing_term, listing_monthly_payment, scorex600-619, scorex620-639, scorex640-649, scorex650-664, scorex665-689, scorex690-701, scorex702-723, scorex724-747, scorex748-777, scorex778+, prosper_score, listing_category_id, stated_monthly_income, employment_status_descriptionFull-time, employment_status_descriptionNot employed, employment_status_descriptionOther, employment_status_descriptionPart-time, employment_status_descriptionRetired, employment_status_descriptionSelf-employed, lender_indicator, monthly_debt, inquiries_last6_months, amount_delinquent, current_credit_lines, open_credit_lines, total_open_revolving_accounts, total_inquiries, delinquencies_over30_days, is_homeownerTRUE</p>
 </div>
 <div id="logistic-regression" class="section level2">
 <h2>Logistic Regression</h2>
+<p>To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes.</p>
+<pre class="r"><code>#log_reg = glm()</code></pre>
 </div>
 
 

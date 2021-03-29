@@ -72,11 +72,26 @@ Based on our generalized linear model, the significant predictors of borrower_ra
 
 
 ## Logistic Regression
+To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes.
 
 ```{r}
 
+default <- ifelse(loandata_clean$loan_status == "3",1,0)
+loandata_clean$default <- default
+str(loandata_clean)
 
-log_reg = glm()
+log_reg = glm(default ~ . , family = "binomial", data = loandata_clean)
+summary(log_reg)
+
+log_reg_2 = glm(default ~  number_of_days + principal_balance + borrower_rate
+                + listing_term + income_range + monthly_debt 
+                + bankcard_utilization + total_inquiries, family = "binomial", data = loandata_clean)
+summary(log_reg_2)
+
+log_reg_3 = glm(default ~  number_of_days + borrower_rate
+                + listing_term + income_range + monthly_debt 
+                + total_inquiries, family = "binomial", data = loandata_clean)
+summary(log_reg_3)
 
 ```
 
