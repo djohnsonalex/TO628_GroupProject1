@@ -72,7 +72,7 @@ Based on our generalized linear model, the significant predictors of borrower_ra
 
 
 ## Logistic Regression
-To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes.
+To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes.  We began the analysis by regressing the default yes/no variable with all variables.  Several of these variables were insignificant and we removed insignificant variables until only significant variables remained.  
 
 ```{r}
 
@@ -95,5 +95,15 @@ summary(log_reg_3)
 
 ```
 
+Based on our logistic regression model, the significant predictors of default are:
+`r names(coef(log_reg_3))`
 
+## Analysis of Arbitrage Oppurtunities 
+Based on our linear and logistic regression models, some variables used to determine borrower rate have little impact on default probability. These include: 
+1. Employment status
+2. Credit score
+3. Amount funded
 
+Potential borrowers who have non-full time jobs, lower credit scores, or need a higher funding amount may have been pushed away by being offered loans with high interest rates.  The fact that these variables do not lead to default gives a Prosper a business opportunities to grow their share with these segments of the population, given that they know these variables have limited impact on default probabilities.  Additionally, since higher interest rates are associated with defaults, by reducing interest rates in these populations, defaults could be expected to be even lower. 
+
+On the other hand, income_range is not a significant  factor to determine interest rate, but has a significant impact on predicting defaults, with a higher income range associated with lower probabilities of default.  Prosper should likely begin using income_range as a larger factor in determining borrower interest rates.   

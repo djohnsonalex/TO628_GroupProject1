@@ -828,8 +828,283 @@ summary(lin_reg_sigonly)</code></pre>
 </div>
 <div id="logistic-regression" class="section level2">
 <h2>Logistic Regression</h2>
-<p>To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes.</p>
-<pre class="r"><code>#log_reg = glm()</code></pre>
+<p>To set up logistic regression, we need to convert the dependent variable to a boolean to reflect the fact that logistic regression deals with binary outcomes. We began the analysis by regressing the default yes/no variable with all variables. Several of these variables were insignificant and we removed insignificant variables until only significant variables remained.</p>
+<pre class="r"><code>default &lt;- ifelse(loandata_clean$loan_status == &quot;3&quot;,1,0)
+loandata_clean$default &lt;- default
+str(loandata_clean)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    33542 obs. of  45 variables:
+##  $ number_of_days               : int  1095 1095 1095 296 1095 1095 1095 1095 1095 1095 ...
+##  $ principal_balance            : num  969 0 0 3636 0 ...
+##  $ loan_status                  : int  1 3 4 2 4 4 1 4 4 4 ...
+##  $ amount_funded                : num  2000 2000 2000 4000 5500 10000 6500 3000 4000 2200 ...
+##  $ prosper_rating               : Factor w/ 7 levels &quot;A&quot;,&quot;AA&quot;,&quot;B&quot;,&quot;C&quot;,..: 3 5 6 7 1 3 3 5 5 5 ...
+##  $ borrower_rate                : num  16.9 24.2 27.9 31.3 12.5 ...
+##  $ listing_term                 : int  60 36 36 36 36 36 36 36 60 60 ...
+##  $ listing_monthly_payment      : num  49.6 78.7 82.6 172.8 184 ...
+##  $ scorex                       : Factor w/ 11 levels &quot;&lt; 600&quot;,&quot;600-619&quot;,..: 8 5 3 4 10 6 11 8 6 5 ...
+##  $ prosper_score                : int  7 4 3 7 7 7 5 3 3 6 ...
+##  $ listing_category_id          : int  13 13 1 2 1 1 1 1 1 1 ...
+##  $ income_range                 : int  4 6 2 2 4 3 6 5 4 4 ...
+##  $ stated_monthly_income        : num  4250 10833 1656 2000 4315 ...
+##  $ income_verifiable            : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
+##  $ dti_wprosper_loan            : num  1.8e-01 2.0e-01 1.1e-01 9.6e-01 1.3e-01 2.9e-01 1.0e+06 1.7e-01 4.4e-01 2.5e-01 ...
+##  $ employment_status_description: Factor w/ 7 levels &quot;Employed&quot;,&quot;Full-time&quot;,..: 1 1 4 2 1 1 7 1 1 1 ...
+##  $ months_employed              : num  56 24 74 132 79 39 40 373 196 199 ...
+##  $ lender_indicator             : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ monthly_debt                 : int  704 2037 106 1738 392 597 3360 1121 2149 1040 ...
+##  $ current_delinquencies        : int  0 0 17 0 0 0 0 0 0 0 ...
+##  $ delinquencies_last7_years    : int  0 7 3 0 0 0 0 0 11 0 ...
+##  $ public_records_last10_years  : int  1 1 0 0 0 0 0 0 0 0 ...
+##  $ public_records_last12_months : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ credit_lines_last7_years     : int  23 43 37 36 9 10 38 19 57 50 ...
+##  $ inquiries_last6_months       : int  0 4 0 0 1 0 0 0 1 0 ...
+##  $ amount_delinquent            : int  0 0 48150 0 0 0 0 0 0 0 ...
+##  $ current_credit_lines         : int  11 7 3 23 4 9 16 6 20 15 ...
+##  $ open_credit_lines            : int  9 7 3 22 4 9 14 6 18 12 ...
+##  $ bankcard_utilization         : num  0.32 0.17 0.34 0.89 0.26 0.69 0.48 0.67 0.66 0.99 ...
+##  $ total_open_revolving_accounts: int  7 2 2 18 3 3 12 7 13 7 ...
+##  $ installment_balance          : num  7733 77425 51997 15501 172 ...
+##  $ real_estate_balance          : int  0 0 0 49084 0 0 342034 0 234434 0 ...
+##  $ revolving_balance            : int  5106 361 519 24586 6266 3296 38834 48702 27035 6035 ...
+##  $ real_estate_payment          : int  0 0 0 488 0 0 4553 0 1988 0 ...
+##  $ revolving_available_percent  : int  70 86 65 19 74 52 52 33 27 13 ...
+##  $ total_inquiries              : int  1 14 6 3 2 3 0 1 4 2 ...
+##  $ total_trade_items            : int  23 43 37 36 9 10 38 19 57 50 ...
+##  $ satisfactory_accounts        : int  20 32 15 34 9 10 31 19 53 49 ...
+##  $ now_delinquent_derog         : int  0 0 17 0 0 0 0 0 0 0 ...
+##  $ was_delinquent_derog         : int  3 11 5 2 0 0 7 0 4 1 ...
+##  $ delinquencies_over30_days    : int  6 10 4 2 0 0 11 0 5 6 ...
+##  $ delinquencies_over60_days    : int  0 3 3 0 0 0 2 0 4 2 ...
+##  $ delinquencies_over90_days    : int  0 7 3 0 0 0 0 0 11 0 ...
+##  $ is_homeowner                 : logi  FALSE TRUE FALSE TRUE FALSE FALSE ...
+##  $ default                      : num  0 1 0 0 0 0 0 0 0 0 ...</code></pre>
+<pre class="r"><code>log_reg = glm(default ~ . , family = &quot;binomial&quot;, data = loandata_clean)
+summary(log_reg)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ ., family = &quot;binomial&quot;, data = loandata_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0813  -0.3492  -0.2520  -0.1792   3.1319  
+## 
+## Coefficients: (3 not defined because of singularities)
+##                                              Estimate Std. Error z value
+## (Intercept)                                -5.893e+00  1.464e+00  -4.026
+## number_of_days                             -7.391e-04  1.806e-04  -4.094
+## principal_balance                           1.073e-04  9.786e-06  10.961
+## loan_status                                 5.844e-01  2.800e-02  20.875
+## amount_funded                              -3.220e-05  1.961e-05  -1.642
+## prosper_ratingAA                            8.332e-02  2.265e-01   0.368
+## prosper_ratingB                            -2.170e-01  1.236e-01  -1.755
+## prosper_ratingC                            -3.817e-01  1.689e-01  -2.260
+## prosper_ratingD                            -6.350e-01  2.393e-01  -2.654
+## prosper_ratingE                            -6.536e-01  3.111e-01  -2.101
+## prosper_ratingHR                           -5.234e-01  3.817e-01  -1.371
+## borrower_rate                               5.368e-02  1.906e-02   2.817
+## listing_term                                1.517e-02  3.825e-03   3.967
+## listing_monthly_payment                     1.045e-03  5.819e-04   1.796
+## scorex600-619                               2.069e-01  3.129e-01   0.661
+## scorex620-639                               3.062e-01  2.894e-01   1.058
+## scorex640-649                               2.804e-01  2.940e-01   0.954
+## scorex650-664                               5.081e-02  2.889e-01   0.176
+## scorex665-689                               1.043e-01  2.831e-01   0.368
+## scorex690-701                               5.377e-02  2.932e-01   0.183
+## scorex702-723                              -1.756e-02  2.904e-01  -0.060
+## scorex724-747                              -1.834e-02  2.959e-01  -0.062
+## scorex748-777                              -1.246e-01  3.056e-01  -0.408
+## scorex778+                                 -4.435e-03  3.237e-01  -0.014
+## prosper_score                              -1.080e-01  2.231e-02  -4.842
+## listing_category_id                         5.590e-04  6.539e-03   0.085
+## income_range                               -2.052e-01  4.927e-02  -4.165
+## stated_monthly_income                      -3.235e-05  1.832e-05  -1.766
+## income_verifiableTRUE                       1.843e+00  1.381e+00   1.335
+## dti_wprosper_loan                           2.110e-06  1.373e-06   1.536
+## employment_status_descriptionFull-time     -2.746e-01  2.852e-01  -0.963
+## employment_status_descriptionNot employed   4.372e-01  5.604e-01   0.780
+## employment_status_descriptionOther          2.244e-01  1.084e-01   2.071
+## employment_status_descriptionPart-time     -9.725e+00  1.272e+02  -0.076
+## employment_status_descriptionRetired       -1.812e-02  1.044e+00  -0.017
+## employment_status_descriptionSelf-employed -3.188e-01  2.126e-01  -1.500
+## months_employed                             5.726e-05  2.777e-04   0.206
+## lender_indicator                            3.976e-02  1.413e-01   0.281
+## monthly_debt                                9.649e-05  3.613e-05   2.671
+## current_delinquencies                      -5.271e-01  4.402e-01  -1.198
+## delinquencies_last7_years                  -1.014e-03  4.306e-03  -0.235
+## public_records_last10_years                 3.874e-02  4.064e-02   0.953
+## public_records_last12_months                1.391e-01  1.085e-01   1.282
+## credit_lines_last7_years                    5.128e-01  4.372e-01   1.173
+## inquiries_last6_months                     -3.941e-02  2.661e-02  -1.481
+## amount_delinquent                           2.849e-06  3.717e-06   0.767
+## current_credit_lines                        3.927e-03  2.129e-02   0.184
+## open_credit_lines                          -7.645e-04  2.423e-02  -0.032
+## bankcard_utilization                       -3.444e-01  1.713e-01  -2.011
+## total_open_revolving_accounts               2.474e-02  1.348e-02   1.836
+## installment_balance                         3.542e-07  8.873e-07   0.399
+## real_estate_balance                        -2.851e-07  3.531e-07  -0.807
+## revolving_balance                          -1.352e-06  1.452e-06  -0.931
+## real_estate_payment                        -3.217e-06  2.580e-05  -0.125
+## revolving_available_percent                -3.621e-03  2.156e-03  -1.680
+## total_inquiries                             1.970e-02  8.461e-03   2.328
+## total_trade_items                                  NA         NA      NA
+## satisfactory_accounts                      -5.168e-01  4.373e-01  -1.182
+## now_delinquent_derog                               NA         NA      NA
+## was_delinquent_derog                       -5.381e-01  4.371e-01  -1.231
+## delinquencies_over30_days                   8.392e-03  6.391e-03   1.313
+## delinquencies_over60_days                   2.163e-03  1.343e-02   0.161
+## delinquencies_over90_days                          NA         NA      NA
+## is_homeownerTRUE                            6.181e-02  7.746e-02   0.798
+##                                            Pr(&gt;|z|)    
+## (Intercept)                                5.67e-05 ***
+## number_of_days                             4.24e-05 ***
+## principal_balance                           &lt; 2e-16 ***
+## loan_status                                 &lt; 2e-16 ***
+## amount_funded                               0.10056    
+## prosper_ratingAA                            0.71294    
+## prosper_ratingB                             0.07918 .  
+## prosper_ratingC                             0.02381 *  
+## prosper_ratingD                             0.00796 ** 
+## prosper_ratingE                             0.03568 *  
+## prosper_ratingHR                            0.17028    
+## borrower_rate                               0.00485 ** 
+## listing_term                               7.29e-05 ***
+## listing_monthly_payment                     0.07246 .  
+## scorex600-619                               0.50847    
+## scorex620-639                               0.29003    
+## scorex640-649                               0.34030    
+## scorex650-664                               0.86039    
+## scorex665-689                               0.71259    
+## scorex690-701                               0.85451    
+## scorex702-723                               0.95177    
+## scorex724-747                               0.95060    
+## scorex748-777                               0.68355    
+## scorex778+                                  0.98907    
+## prosper_score                              1.28e-06 ***
+## listing_category_id                         0.93187    
+## income_range                               3.11e-05 ***
+## stated_monthly_income                       0.07743 .  
+## income_verifiableTRUE                       0.18188    
+## dti_wprosper_loan                           0.12445    
+## employment_status_descriptionFull-time      0.33573    
+## employment_status_descriptionNot employed   0.43525    
+## employment_status_descriptionOther          0.03838 *  
+## employment_status_descriptionPart-time      0.93908    
+## employment_status_descriptionRetired        0.98616    
+## employment_status_descriptionSelf-employed  0.13372    
+## months_employed                             0.83665    
+## lender_indicator                            0.77839    
+## monthly_debt                                0.00756 ** 
+## current_delinquencies                       0.23109    
+## delinquencies_last7_years                   0.81391    
+## public_records_last10_years                 0.34050    
+## public_records_last12_months                0.19977    
+## credit_lines_last7_years                    0.24088    
+## inquiries_last6_months                      0.13851    
+## amount_delinquent                           0.44327    
+## current_credit_lines                        0.85367    
+## open_credit_lines                           0.97483    
+## bankcard_utilization                        0.04435 *  
+## total_open_revolving_accounts               0.06640 .  
+## installment_balance                         0.68978    
+## real_estate_balance                         0.41947    
+## revolving_balance                           0.35179    
+## real_estate_payment                         0.90076    
+## revolving_available_percent                 0.09295 .  
+## total_inquiries                             0.01989 *  
+## total_trade_items                                NA    
+## satisfactory_accounts                       0.23727    
+## now_delinquent_derog                             NA    
+## was_delinquent_derog                        0.21831    
+## delinquencies_over30_days                   0.18916    
+## delinquencies_over60_days                   0.87208    
+## delinquencies_over90_days                        NA    
+## is_homeownerTRUE                            0.42494    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12552  on 33541  degrees of freedom
+## Residual deviance: 11562  on 33481  degrees of freedom
+## AIC: 11684
+## 
+## Number of Fisher Scoring iterations: 11</code></pre>
+<pre class="r"><code>log_reg_2 = glm(default ~  number_of_days + principal_balance + borrower_rate
+                + listing_term + income_range + monthly_debt 
+                + bankcard_utilization + total_inquiries, family = &quot;binomial&quot;, data = loandata_clean)
+summary(log_reg_2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ number_of_days + principal_balance + 
+##     borrower_rate + listing_term + income_range + monthly_debt + 
+##     bankcard_utilization + total_inquiries, family = &quot;binomial&quot;, 
+##     data = loandata_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9382  -0.3373  -0.2817  -0.2359   2.9298  
+## 
+## Coefficients:
+##                        Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)          -2.828e+00  2.270e-01 -12.456  &lt; 2e-16 ***
+## number_of_days       -1.075e-03  1.716e-04  -6.266 3.70e-10 ***
+## principal_balance    -8.818e-06  8.090e-06  -1.090 0.275735    
+## borrower_rate         5.560e-02  4.742e-03  11.724  &lt; 2e-16 ***
+## listing_term          9.684e-03  2.440e-03   3.969 7.20e-05 ***
+## income_range         -2.139e-01  2.710e-02  -7.893 2.95e-15 ***
+## monthly_debt          6.753e-05  3.007e-05   2.246 0.024692 *  
+## bankcard_utilization -1.162e-01  9.957e-02  -1.167 0.243036    
+## total_inquiries       2.352e-02  6.739e-03   3.490 0.000482 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12552  on 33541  degrees of freedom
+## Residual deviance: 12166  on 33533  degrees of freedom
+## AIC: 12184
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>log_reg_3 = glm(default ~  number_of_days + borrower_rate
+                + listing_term + income_range + monthly_debt 
+                + total_inquiries, family = &quot;binomial&quot;, data = loandata_clean)
+summary(log_reg_3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ number_of_days + borrower_rate + listing_term + 
+##     income_range + monthly_debt + total_inquiries, family = &quot;binomial&quot;, 
+##     data = loandata_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.8616  -0.3379  -0.2824  -0.2359   2.9483  
+## 
+## Coefficients:
+##                   Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)     -2.909e+00  2.217e-01 -13.122  &lt; 2e-16 ***
+## number_of_days  -9.841e-04  1.532e-04  -6.424 1.33e-10 ***
+## borrower_rate    5.484e-02  4.514e-03  12.149  &lt; 2e-16 ***
+## listing_term     8.526e-03  2.187e-03   3.899 9.66e-05 ***
+## income_range    -2.214e-01  2.679e-02  -8.264  &lt; 2e-16 ***
+## monthly_debt     6.331e-05  3.045e-05   2.079 0.037579 *  
+## total_inquiries  2.537e-02  6.603e-03   3.843 0.000122 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12552  on 33541  degrees of freedom
+## Residual deviance: 12168  on 33535  degrees of freedom
+## AIC: 12182
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>Based on our logistic regression model, the significant predictors of default are: (Intercept), number_of_days, borrower_rate, listing_term, income_range, monthly_debt, total_inquiries</p>
+</div>
+<div id="analysis-of-arbitrage-oppurtunities" class="section level2">
+<h2>Analysis of Arbitrage Oppurtunities</h2>
+<p>Based on our linear and logistic regression models, some variables used to determine borrower rate have little impact on default probability. These include: 1. Employment status 2. Credit score 3. Amount funded</p>
+<p>Potential borrowers who have non-full time jobs, lower credit scores, or need a higher funding amount may have been pushed away by being offered loans with high interest rates. The fact that these variables do not lead to default gives a Prosper a business opportunities to grow their share with these segments of the population, given that they know these variables have limited impact on default probabilities. Additionally, since higher interest rates are associated with defaults, by reducing interest rates in these populations, defaults could be expected to be even lower.</p>
+<p>On the other hand, income_range is not a significant factor to determine interest rate, but has a significant impact on predicting defaults, with a higher income range associated with lower probabilities of default. Prosper should likely begin using income_range as a larger factor in determining borrower interest rates.</p>
 </div>
 
 
